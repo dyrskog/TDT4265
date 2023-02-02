@@ -12,7 +12,11 @@ def pre_process_images(X: np.ndarray):
     """
     assert X.shape[1] == 784,\
         f"X.shape[1]: {X.shape[1]}, should be 784"
-    # TODO implement this function (Task 2a)
+    
+    # Normalize array
+    X = (X-(255/2))/(255/2)
+    bias = np.ones((X.shape[0], 1))
+    X = np.append(X, bias, axis=1)
     return X
 
 
@@ -24,17 +28,19 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray) -> float:
     Returns:
         Cross entropy error (float)
     """
-    # TODO implement this function (Task 2a)
     assert targets.shape == outputs.shape,\
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
-    return 0
+    
+    Cn = -(targets*np.log(outputs) + (1 - targets)*np.log(1-outputs))
+    Cn = np.average(Cn)
+    return Cn
 
 
 class BinaryModel:
 
     def __init__(self):
         # Define number of input nodes
-        self.I = None
+        self.I = 785
         self.w = np.zeros((self.I, 1))
         self.grad = None
 
@@ -45,8 +51,9 @@ class BinaryModel:
         Returns:
             y: output of model with shape [batch size, 1]
         """
-        # TODO implement this function (Task 2a)
-        return None
+        
+        y = 1/(1 + np.exp(-np.dot(X,self.w)))
+        return y
 
     def backward(self, X: np.ndarray, outputs: np.ndarray, targets: np.ndarray) -> None:
         """
@@ -56,10 +63,14 @@ class BinaryModel:
             outputs: outputs of model of shape: [batch size, 1]
             targets: labels/targets of each image of shape: [batch size, 1]
         """
-        # TODO implement this function (Task 2a)
+
         assert targets.shape == outputs.shape,\
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
-        self.grad = np.zeros_like(self.w)
+        
+        # dC/dw = -(y-y_hat)x / batch_size
+        self.grad = -np.dot(np.transpose(X), (targets - outputs))
+        self.grad = self.grad/X.shape[0]
+
         assert self.grad.shape == self.w.shape,\
             f"Grad shape: {self.grad.shape}, w: {self.w.shape}"
 
