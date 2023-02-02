@@ -1,0 +1,21 @@
+
+\begin{equation*}
+    \frac{\partial C^n(w)}{\partial w_i} = \frac{\partial C^n}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial w_i}
+\end{equation*}
+
+Where:
+\begin{align*}
+    \frac{\partial C^n}{\partial \hat{y}} &= - \frac{y^n}{\hat{y}^n} - \frac{1}{1 - \hat{y}^n} \cdot (-1) + \frac{y^n}{1-\hat{y}^n} \cdot (-1) \\
+    &= \frac{1 - y^n}{1 - \hat{y}^n} - \frac{y^n}{\hat{y}^n} \\
+    \frac{\partial \hat{y}}{\partial w_i} &= \frac{\partial f(x^n)}{\partial w_i} = x_i^n\hat{y}^n(1-\hat{y}^n)
+\end{align*}
+
+Inserted in the original equation:
+
+\begin{align*}
+    \frac{\partial C^n(w)}{\partial w_i} &= \left( \frac{1 - y^n}{1 - \hat{y}^n} - \frac{y^n}{\hat{y}^n} \right)x_i^n\hat{y}^n(1-\hat{y}^n) \\
+    &= (1-y^n)x_i^n\hat{y}^n - x_i^ny^n(1-\hat{y}^n) \\
+    &= x_i^n\hat{y^n} - x_i^ny^n \\
+    &= (\hat{y}^n - y^n)x_i^n \\
+    &= -(y^n - \hat{y}^n)x_i^n
+\end{align*}
