@@ -23,44 +23,41 @@ def main():
     Y_val = one_hot_encode(Y_val, 10)
 
     # Intialize model
-    # model = SoftmaxModel(l2_reg_lambda)
-    # # Train model
-    # trainer = SoftmaxTrainer(
-    #     model, learning_rate, batch_size, shuffle_dataset,
-    #     X_train, Y_train, X_val, Y_val,
-    # )
-    # train_history, val_history = trainer.train(num_epochs)
+    model = SoftmaxModel(l2_reg_lambda)
+    # Train model
+    trainer = SoftmaxTrainer(
+        model, learning_rate, batch_size, shuffle_dataset,
+        X_train, Y_train, X_val, Y_val,
+    )
+    train_history, val_history = trainer.train(num_epochs)
 
-    # # Train a model with L2 regularization (task 4b)
+    # Train a model with L2 regularization (task 4b)
 
-    # model1 = SoftmaxModel(l2_reg_lambda=1.0)
-    # trainer = SoftmaxTrainer(
-    #     model1, learning_rate, batch_size, shuffle_dataset,
-    #     X_train, Y_train, X_val, Y_val,
-    # )
-    # train_history_reg01, val_history_reg01 = trainer.train(num_epochs)
-    # # You can finish the rest of task 4 below this point.
-    # weight = model.w
-    # weight1 = model1.w
+    model1 = SoftmaxModel(l2_reg_lambda=1.0)
+    trainer = SoftmaxTrainer(
+        model1, learning_rate, batch_size, shuffle_dataset,
+        X_train, Y_train, X_val, Y_val,
+    )
+    train_history_reg01, val_history_reg01 = trainer.train(num_epochs)
+    # You can finish the rest of task 4 below this point.
+    weight = model.w
+    weight1 = model1.w
 
 
-    # weight = np.transpose(weight[:-1,:]).reshape(10,28,28)
-    # weight = np.concatenate(weight, axis=1)
-    # weight1 = np.transpose(weight1[:-1,:]).reshape(10,28,28)
-    # weight1 = np.concatenate(weight1, axis=1)
-    # fig, (ax1, ax2) = plt.subplots(2,1)
+    weight = np.transpose(weight[:-1,:]).reshape(10,28,28)
+    weight = np.concatenate(weight, axis=1)
+    weight1 = np.transpose(weight1[:-1,:]).reshape(10,28,28)
+    weight1 = np.concatenate(weight1, axis=1)
+    fig, (ax1, ax2) = plt.subplots(2,1)
 
-    # ax1.imshow(weight, cmap="gray")
-    # ax1.set_title(f'lambda = 0')
-    # ax1.axis('off')
-    # ax2.imshow(weight1, cmap="gray")
-    # ax2.set_title(f'lambda = 1')
-    # ax2.axis('off')
+    ax1.imshow(weight, cmap="gray")
+    ax1.set_title(f'lambda = 0')
+    ax1.axis('off')
+    ax2.imshow(weight1, cmap="gray")
+    ax2.set_title(f'lambda = 1')
+    ax2.axis('off')
 
-    # plt.show()
-    #plt.savefig("task4b_softmax_weight.png")
-    # Plotting of softmax weights (Task 4b)
-    #plt.imsave("task4b_softmax_weight.png", weight, cmap="gray")
+    plt.show()
 
     # Plotting of accuracy for difference values of lambdas (task 4c)
     l2_lambdas = [1, .1, .01, .001]

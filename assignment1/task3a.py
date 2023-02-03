@@ -15,10 +15,6 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
 
     assert targets.shape == outputs.shape,\
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
-    
-
-    # ce = targets * np.log(outputs) #sol
-    # return -ce.sum(axis=1).mean() #sol
 
     Cn = -targets * np.log(outputs)
     return np.average(Cn.sum(axis=1))
@@ -57,9 +53,6 @@ class SoftmaxModel:
             outputs: outputs of model of shape: [batch size, num_outputs]
             targets: labels/targets of each image of shape: [batch size, num_classes]
         """
-        # TODO implement this function (Task 3a)
-        # To implement L2 regularization task (4b) you can get the lambda value in self.l2_reg_lambda
-        # which is defined in the constructor.
         assert targets.shape == outputs.shape,\
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
 
