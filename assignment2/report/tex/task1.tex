@@ -1,0 +1,45 @@
+
+
+\begin{align*}
+    \frac{\partial C}{\partial w_{ji}} &= \frac{\partial C}{\partial z_j} \frac{\partial z_j}{\partial w_{ji}} \\
+    &= \delta_j \frac{\partial z_j}{\partial w_{ji}}
+\end{align*}
+
+
+\begin{align*}
+    \frac{\partial z_j}{\partial w_{ji}} &= \frac{\partial}{\partial w_{ji}} w_{j'}^T \cdot x
+    &= \begin{cases}
+        0, & j' \neq j \\
+        x_i, & j' = j
+    \end{cases}
+\end{align*}
+
+
+\begin{align*}
+    \frac{\partial C}{\partial w_{ji}} &= \delta_j \cdot x_i
+\end{align*}
+Inserted in the the equation for $w_{ji}$ we get:
+\begin{align*}
+    w_{ji} := w_{ji} - \alpha \delta_j x_i
+\end{align*}
+
+
+Using the chain rule we can decompose $\delta_j$ and sum over all the nodes in layer $k$:
+\begin{align*}
+    \delta_j = \frac{\partial C}{\partial z_j} &= \sum_k \frac{\partial C}{\partial z_k} \frac{\partial z_k}{\partial a_j} \frac{\partial a_j}{\partial z_j} \\
+\end{align*}
+Know that $f'(z_j) = \frac{\partial a_j}{\partial z_j}$, $\delta_k = \frac{\partial C}{\partial z_k}$:
+\begin{align*}
+    \delta_j = f'(z_j) \sum_k \delta_k \frac{\partial z_k}{\partial a_j}
+\end{align*}
+\begin{align*}
+    \frac{\partial z_k}{\partial a_j} &= \frac{\partial}{a_j} \sum_j' w_{kj'}a_{j'} + b_{j'} \\
+    &= \begin{cases}
+        0, & j' \neq j \\
+        w_{kj}, & j' = j
+    \end{cases}
+\end{align*}
+Which leads to:
+\begin{align*}
+    \delta_j = f'(z_j) \sum_k \delta_k w_{kj}
+\end{align*}

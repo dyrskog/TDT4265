@@ -24,6 +24,7 @@ files_to_include = {
     "task2a": [".py"],
     "task3": [".py"],
     "task4c": [".py"],
+    "task4d": [".py"],
     "trainer": [".py"],
     "utils": [".py"],
     "mnist": [".py"]

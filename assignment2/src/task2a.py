@@ -14,6 +14,15 @@ def pre_process_images(X: np.ndarray):
     assert X.shape[1] == 784,\
         f"X.shape[1]: {X.shape[1]}, should be 784"
     # TODO implement this function (Task 2a)
+    mean = np.mean(X)
+    std = np.std(X)
+    print(f'mean = {mean}, std = {std}')
+    X = (X.astype(float)-mean)/std
+
+    # Bias trick
+    bias = np.ones((X.shape[0], 1))
+    X = np.append(X, bias, axis=1)
+    
     return X
 
 
@@ -27,8 +36,37 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
     """
     assert targets.shape == outputs.shape,\
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
-    # TODO: Implement this function (copy from last assignment)
-    raise NotImplementedError
+    
+    Cn = targets * np.log(outputs)
+    return -Cn.sum(axis=1).mean()
+
+
+def sigmoid(z: np.ndarray):
+    """
+    Args:
+        z: input vector
+    Returns:
+        Sigmoid function of z (np.ndarray)
+    """
+    return 1/(1 + np.exp(-z))
+
+
+def improved_sigmoid(z: np.ndarray):
+    return 1.7159*np.tanh(z*(2/3))
+
+
+def sigmoid_derivative(z: np.ndarray):
+    sig = sigmoid(z)
+    return sig*(1-sig)
+
+
+def improved_sigmoid_derivative(z: np.ndarray):
+    return (1 - np.tanh(z*(2/3))**2)*1.7159*(2/3)
+
+
+def softmax(z: np.ndarray):
+    exp_sum = np.exp(z).sum(axis=1, keepdims=True)
+    return np.exp(z)/exp_sum
 
 
 class SoftmaxModel:
@@ -43,7 +81,7 @@ class SoftmaxModel:
         # Always reset random seed before weight init to get comparable results.
         np.random.seed(1)
         # Define number of input nodes
-        self.I = None
+        self.I = 785
         self.use_improved_sigmoid = use_improved_sigmoid
         self.use_relu = use_relu
         self.use_improved_weight_init = use_improved_weight_init
@@ -60,6 +98,15 @@ class SoftmaxModel:
             w_shape = (prev, size)
             print("Initializing weight to shape:", w_shape)
             w = np.zeros(w_shape)
+
+            if self.use_improved_weight_init:
+                # Init with weights within a normal distribution
+                mean = 0
+                sd = 1/np.sqrt(size)
+                w = np.random.normal(mean, sd, size=w_shape)
+            else:
+                # Init with random weights in range [-1 1]
+                w = np.random.uniform(-1, 1, w_shape)
             self.ws.append(w)
             prev = size
         self.grads = [None for i in range(len(self.ws))]
@@ -74,7 +121,22 @@ class SoftmaxModel:
         # TODO implement this function (Task 2b)
         # HINT: For performing the backward pass, you can save intermediate activations in variables in the forward pass.
         # such as self.hidden_layer_output = ...
-        return None
+        self.node_inputs = []
+        self.activation_inputs = []
+
+        X = X
+        for layer in range(len(self.ws)):
+            self.node_inputs.append(X)
+            X = X.dot(self.ws[layer])
+            if layer == (len(self.ws) - 1):
+                X = softmax(X)
+            else:
+                self.activation_inputs.append(X)
+                if self.use_improved_sigmoid:
+                    X = improved_sigmoid(X)
+                else:
+                    X = sigmoid(X)
+        return X
 
     def backward(self, X: np.ndarray, outputs: np.ndarray,
                  targets: np.ndarray) -> None:
@@ -91,7 +153,27 @@ class SoftmaxModel:
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
         # A list of gradients.
         # For example, self.grads[0] will be the gradient for the first hidden layer
+        self.zero_grad()
         self.grads = []
+        batch_size = X.shape[0]
+        # Last layer
+        delta = -(targets - outputs)
+        
+        # Hidden layers 
+        for layer in range(len(self.ws)-1, 0, -1):
+            grad = (delta.T.dot(self.node_inputs[layer]))/batch_size
+            self.grads = [grad.T] + self.grads
+
+            if self.use_improved_sigmoid:
+                delta = improved_sigmoid_derivative(self.activation_inputs[layer-1])*delta.dot(self.ws[layer].T)
+            else:
+                delta = sigmoid_derivative(self.activation_inputs[layer-1])*delta.dot(self.ws[layer].T)    
+
+        # Avoid using sigmoid function on input layer
+        grad = (delta.T.dot(self.node_inputs[0]))/batch_size
+        self.grads = [grad.T] + self.grads
+
+
         for grad, w in zip(self.grads, self.ws):
             assert grad.shape == w.shape,\
                 f"Expected the same shape. Grad shape: {grad.shape}, w: {w.shape}."
@@ -108,8 +190,10 @@ def one_hot_encode(Y: np.ndarray, num_classes: int):
     Returns:
         Y: shape [Num examples, num classes]
     """
-    # TODO: Implement this function (copy from last assignment)
-    raise NotImplementedError
+    y_ohe = np.zeros((Y.shape[0],num_classes))
+    y_ohe[np.arange(Y.shape[0]), Y.squeeze()] = 1
+
+    return y_ohe
 
 
 def gradient_approximation_test(
@@ -159,8 +243,8 @@ def main():
         f"Expected X_train to have 785 elements per image. Shape was: {X_train.shape}"
 
     neurons_per_layer = [64, 10]
-    use_improved_sigmoid = True
-    use_improved_weight_init = True
+    use_improved_sigmoid = False
+    use_improved_weight_init = False
     use_relu = False
     model = SoftmaxModel(
         neurons_per_layer, use_improved_sigmoid, use_improved_weight_init, use_relu)
