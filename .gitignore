@@ -1,6 +1,5 @@
 **/__pycache__/**
-**/report/
-**/data/*
-**/testing/*
-
-**/checkpoints/*
+report/
+data/
+testing/
+checkpoints/
